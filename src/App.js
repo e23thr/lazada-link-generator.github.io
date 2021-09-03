@@ -48,14 +48,22 @@ function App() {
 
   const generateNow = async () => {
     // const text = await navigator.clipboard.readText();
-    const text = inputUrl;
-    let validUrl = "";
-    if (isValidHttpUrl(text)) {
-      const d = {
-        url: text
-      };
-      validUrl = `${urlPrefix}?${serialize(d)}`;
+
+    if (!isValidHttpUrl(inputUrl)) {
+      return;
     }
+
+    // const response = await fetch(inputUrl, {
+    //   mode: 'no-cors'
+    // });
+
+    // const text = await response.text();
+    // console.log(text);
+
+    const d = {
+      url: inputUrl
+    };
+    const validUrl = `${urlPrefix}?${serialize(d)}`;
 
     if (validUrl) {
       const response = await fetch('https://api-ssl.bitly.com/v4/shorten', {
@@ -90,7 +98,7 @@ function App() {
   return (
     <div className="container-fluid w-100">
       <div className="container-fluid bg-primary mb-3 text-white text-center h1 py-3">
-        Utility for Lazada Retailers (Works on Google Chrome)
+        Utility for Lazada Retailers
       </div>
       <div className="container">
         <div className="card">
