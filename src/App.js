@@ -83,9 +83,7 @@ function App() {
       });
 
       const data = await response.json();
-      await navigator.clipboard.writeText(data.link);
       setTargetUrl(data.link);
-
     };
 
   };
