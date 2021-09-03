@@ -43,44 +43,39 @@ function App() {
     return str.join("&");
   };
 
-  const generateNow = () => {
-    navigator.clipboard.readText()
-      .then(text => {
-        if (isValidHttpUrl(text)) {
-          const d = {
-            url: text
-          };
-          return `${urlPrefix}?${serialize(d)}`;
-        } else {
-          throw new Error("Not a valid URL");
-        }
-      })
-      .then(url => {
-        if (url) {
-          return fetch('https://api-ssl.bitly.com/v4/shorten', {
-            method: "POST",
-            mode: "cors",
-            cache: "no-cache",
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${bitlyToken}`
-            },
-            redirect: "follow",
-            referrerPolicy: "no-referrer",
-            body: JSON.stringify({
-              domain: "bit.ly",
-              long_url: url
-            })
-          });
-        };
-      })
-      .then(response => {
-        return response.json();
-      })
-      .then(data => {
-        setTargetUrl(data.link);
-        navigator.clipboard.writeText(data.link);
+  const generateNow = async () => {
+    const text = await navigator.clipboard.readText();
+    let validUrl = "";
+    if (isValidHttpUrl(text)) {
+      const d = {
+        url: text
+      };
+      validUrl = `${urlPrefix}?${serialize(d)}`;
+    }
+
+    if (validUrl) {
+      const response = await fetch('https://api-ssl.bitly.com/v4/shorten', {
+        method: "POST",
+        mode: "cors",
+        cache: "no-cache",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${bitlyToken}`
+        },
+        redirect: "follow",
+        referrerPolicy: "no-referrer",
+        body: JSON.stringify({
+          domain: "bit.ly",
+          long_url: validUrl
+        })
       });
+
+      data = await response.json();
+      await navigator.clipboard.writeText(data.link);
+      setTargetUrl(data.link);
+
+    };
+
   };
 
   useEffect(() => {
