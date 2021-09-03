@@ -137,7 +137,7 @@ function App() {
             <button className="form-control mt-3" onClick={generateNow}>สร้าง link</button>
 
 
-            <input type="text" className={`form-control mt-3 ${targetUrl === '' ? 'd-none' : ''}`} value={targetUrl} onChange={() => { }} />
+            <input type="text" className={`form-control mt-3`} value={targetUrl} onChange={() => { }} />
             {/* <div className={`container text-center mt-3 ${targetUrl === '' ? 'd-none' : ''} `}>{targetUrl}</div> */}
           </div>
         </div>
