@@ -70,7 +70,7 @@ function App() {
         })
       });
 
-      data = await response.json();
+      const data = await response.json();
       await navigator.clipboard.writeText(data.link);
       setTargetUrl(data.link);
 
