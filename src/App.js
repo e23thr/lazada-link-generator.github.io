@@ -1,25 +1,133 @@
-import logo from './logo.svg';
+
 import './App.css';
+import React, { useState, useEffect } from 'react';
+
+const URL_PREFIX_KEY = "url_prefix";
+const BITLY_TOKEN_KEY = "bitly_token";
 
 function App() {
+
+  const [urlPrefix, setUrlPrefixState] = useState("");
+  const [bitlyToken, setBitlyTokenState] = useState("");
+  const [targetUrl, setTargetUrl] = useState("");
+
+
+  const setUrlPrefix = e => {
+    setUrlPrefixState(e.target.value);
+    localStorage.setItem(URL_PREFIX_KEY, e.target.value);
+  };
+
+  const setBitlyToken = e => {
+    setBitlyTokenState(e.target.value);
+    localStorage.setItem(BITLY_TOKEN_KEY, e.target.value);
+  };
+
+  const isValidHttpUrl = (string) => {
+    let url;
+
+    try {
+      url = new URL(string);
+    } catch (_) {
+      return false;
+    }
+
+    return url.protocol === "http:" || url.protocol === "https:";
+  };
+
+  const serialize = (obj) => {
+    var str = [];
+    for (var p in obj)
+      if (obj.hasOwnProperty(p)) {
+        str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+      }
+    return str.join("&");
+  };
+
+  const generateNow = () => {
+    navigator.clipboard.readText()
+      .then(text => {
+        if (isValidHttpUrl(text)) {
+          const d = {
+            url: text
+          };
+          return `${urlPrefix}?${serialize(d)}`;
+        } else {
+          throw new Error("Not a valid URL");
+        }
+      })
+      .then(url => {
+        if (url) {
+          return fetch('https://api-ssl.bitly.com/v4/shorten', {
+            method: "POST",
+            mode: "cors",
+            cache: "no-cache",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${bitlyToken}`
+            },
+            redirect: "follow",
+            referrerPolicy: "no-referrer",
+            body: JSON.stringify({
+              domain: "bit.ly",
+              long_url: url
+            })
+          });
+        };
+      })
+      .then(response => {
+        return response.json();
+      })
+      .then(data => {
+        setTargetUrl(data.link);
+        navigator.clipboard.writeText(data.link);
+      });
+  };
+
+  useEffect(() => {
+    setUrlPrefixState(localStorage.getItem(URL_PREFIX_KEY) || "");
+    setBitlyTokenState(localStorage.getItem(BITLY_TOKEN_KEY) || "");
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="container-fluid w-100">
+      <div className="container-fluid bg-primary mb-3 text-white text-center h1 py-3">
+        Utility for Lazada Retailers
+      </div>
+      <div className="container">
+        <div className="card">
+          <div className="card-body">
+            <div className="card-title">
+              URL ของคุณ
+            </div>
+            <div className="card-subtitle mb-2 text-muted">
+              ตัวอย่าง https://c.lazada.co.th/t/xxxxxxx
+            </div>
+            <input className="form-control" value={urlPrefix} onChange={setUrlPrefix} />
+          </div>
+        </div>
+
+        <div className="card">
+          <div className="card-body">
+            <div className="card-title">
+              Bitly Token
+            </div>
+            <div className="card-subtitle mb-2 text-muted">
+              Token นี้จะเป็นตัวอักษรยาวๆ ใช้เพื่อสร้าง short url ให้อัตโนมัติ
+            </div>
+            <input type="text" className="form-control" value={bitlyToken} onChange={setBitlyToken} />
+          </div>
+        </div>
+
+        <div className="card">
+          <div className="card-body">
+            <button className="form-control" onClick={generateNow}>ใช้ URL จาก clipboard</button>
+            <div className={`mt - 3 ${targetUrl === '' ? 'd-none' : ''} `}>{targetUrl}</div>
+          </div>
+        </div>
+
+      </div>
     </div>
   );
 }
 
-export default App;
+export default App;;
