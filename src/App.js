@@ -9,9 +9,12 @@ function App() {
 
   const [urlPrefix, setUrlPrefixState] = useState("");
   const [bitlyToken, setBitlyTokenState] = useState("");
+  const [inputUrl, setInputUrlState] = useState("");
   const [targetUrl, setTargetUrl] = useState("");
 
-
+  const setInputUrl = e => {
+    setInputUrlState(e.target.value);
+  };
   const setUrlPrefix = e => {
     setUrlPrefixState(e.target.value);
     localStorage.setItem(URL_PREFIX_KEY, e.target.value);
@@ -44,7 +47,8 @@ function App() {
   };
 
   const generateNow = async () => {
-    const text = await navigator.clipboard.readText();
+    // const text = await navigator.clipboard.readText();
+    const text = inputUrl;
     let validUrl = "";
     if (isValidHttpUrl(text)) {
       const d = {
@@ -115,8 +119,18 @@ function App() {
 
         <div className="card">
           <div className="card-body">
-            <button className="form-control" onClick={generateNow}>ใช้ URL จาก clipboard</button>
-            <div className={`mt - 3 ${targetUrl === '' ? 'd-none' : ''} `}>{targetUrl}</div>
+
+            <div className="card-title">
+              วาง URL จาก web lazada
+            </div>
+
+            <input type="text" className="form-control" value={inputUrl} onChange={setInputUrl} />
+
+            <button className="form-control mt-3" onClick={generateNow}>สร้าง link</button>
+
+
+            <input type="text" className={`form-control mt-3 ${targetUrl === '' ? 'd-none' : ''}`} value={targetUrl} onChange={() => { }} />
+            {/* <div className={`container text-center mt-3 ${targetUrl === '' ? 'd-none' : ''} `}>{targetUrl}</div> */}
           </div>
         </div>
 
