@@ -91,7 +91,7 @@ function App() {
   return (
     <div className="container-fluid w-100">
       <div className="container-fluid bg-primary mb-3 text-white text-center h1 py-3">
-        Utility for Lazada Retailers
+        Utility for Lazada Retailers (Works on Google Chrome)
       </div>
       <div className="container">
         <div className="card">
